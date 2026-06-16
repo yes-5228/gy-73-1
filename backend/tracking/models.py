@@ -10,6 +10,7 @@ class ProgressEvent(models.Model):
     STAGE_IN_TRANSIT = "in_transit"
     STAGE_UNLOADING = "unloading"
     STAGE_COMPLETED = "completed"
+    STAGE_CANCELLED = "cancelled"
     STAGE_CHOICES = [
         (STAGE_CREATED, "已预约"),
         (STAGE_CLAIMED, "已抢单"),
@@ -19,6 +20,7 @@ class ProgressEvent(models.Model):
         (STAGE_IN_TRANSIT, "运输中"),
         (STAGE_UNLOADING, "卸货中"),
         (STAGE_COMPLETED, "已完成"),
+        (STAGE_CANCELLED, "已取消"),
     ]
 
     order = models.ForeignKey("orders.MoveOrder", related_name="progress_events", on_delete=models.CASCADE)

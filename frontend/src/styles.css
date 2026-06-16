@@ -281,7 +281,9 @@ select:disabled {
 
 .button-row {
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  margin-top: 12px;
 }
 
 .side-stack {
@@ -352,6 +354,152 @@ select:disabled {
 .empty {
   color: #6b7280;
   margin: 0;
+}
+
+.status-red {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.btn-cancel {
+  align-items: center;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 6px;
+  color: #991b1b;
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 700;
+  gap: 6px;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 14px;
+}
+
+.btn-cancel:hover {
+  background: #fee2e2;
+}
+
+.cancel-info {
+  background: #fef2f2;
+  border-radius: 6px;
+  color: #991b1b;
+  font-size: 13px;
+  margin: 10px 0 0;
+  padding: 10px 12px;
+}
+
+.cancel-info strong {
+  color: #7f1d1d;
+}
+
+.modal-overlay {
+  align-items: center;
+  background: rgba(15, 23, 42, 0.6);
+  display: flex;
+  inset: 0;
+  justify-content: center;
+  position: fixed;
+  z-index: 100;
+}
+
+.modal {
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 25px 50px rgba(0, 0, 0, 0.25);
+  max-width: 480px;
+  width: 90%;
+}
+
+.modal-head {
+  align-items: center;
+  border-bottom: 1px solid #e5e7eb;
+  display: flex;
+  justify-content: space-between;
+  padding: 18px 20px;
+}
+
+.modal-head h3 {
+  font-size: 18px;
+  margin: 0;
+}
+
+.modal-close {
+  background: transparent;
+  border: 0;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.modal-close:hover {
+  color: #1f2937;
+}
+
+.modal-body {
+  display: grid;
+  gap: 14px;
+  padding: 20px;
+}
+
+.modal-body p {
+  margin: 0;
+}
+
+.form-group {
+  display: grid;
+  gap: 6px;
+}
+
+.form-group label {
+  color: #4b5563;
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.modal-foot {
+  border-top: 1px solid #e5e7eb;
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  padding: 14px 20px;
+}
+
+.btn-secondary,
+.btn-danger {
+  align-items: center;
+  border: 0;
+  border-radius: 6px;
+  cursor: pointer;
+  display: inline-flex;
+  font-weight: 700;
+  justify-content: center;
+  min-height: 40px;
+  padding: 0 16px;
+}
+
+.btn-secondary {
+  background: #e5e7eb;
+  color: #374151;
+}
+
+.btn-secondary:hover {
+  background: #d1d5db;
+}
+
+.btn-danger {
+  background: #dc2626;
+  color: white;
+}
+
+.btn-danger:hover {
+  background: #b91c1c;
+}
+
+.btn-danger:disabled {
+  background: #fca5a5;
+  cursor: not-allowed;
+  opacity: 1;
 }
 
 @media (max-width: 1180px) {

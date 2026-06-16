@@ -24,6 +24,8 @@ export const api = {
     request(`/orders/${orderId}/claim/`, { method: "POST", body: JSON.stringify({ worker_id: workerId }) }),
   assignOrder: (orderId, workerId) =>
     request(`/orders/${orderId}/assign/`, { method: "POST", body: JSON.stringify({ worker_id: workerId }) }),
+  cancelOrder: (orderId, payload) =>
+    request(`/orders/${orderId}/cancel/`, { method: "POST", body: JSON.stringify(payload) }),
   addProgress: (orderId, payload) =>
     request(`/tracking/orders/${orderId}/events/`, { method: "POST", body: JSON.stringify(payload) }),
   createReview: (orderId, payload) =>

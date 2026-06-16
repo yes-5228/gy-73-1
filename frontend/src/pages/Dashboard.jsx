@@ -12,14 +12,16 @@ export default function Dashboard({
   onCreateWorker,
   onClaim,
   onAssign,
+  onCancel,
   onProgress,
   onReview,
 }) {
   const stats = [
-    ["待处理订单", orders.filter((order) => order.status !== "completed").length],
+    ["待处理", orders.filter((order) => ["pending", "claimed", "assigned"].includes(order.status)).length],
     ["服务中", orders.filter((order) => order.status === "in_progress").length],
-    ["师傅数量", workers.length],
     ["已完成", orders.filter((order) => order.status === "completed").length],
+    ["已取消", orders.filter((order) => order.status === "cancelled").length],
+    ["师傅数量", workers.length],
   ];
 
   return (
@@ -44,7 +46,7 @@ export default function Dashboard({
         <div className="layout-grid">
           <OrderForm onCreate={onCreateOrder} />
           <WorkerPanel workers={workers} onCreate={onCreateWorker} />
-          <OrderBoard orders={orders} workers={workers} onClaim={onClaim} onAssign={onAssign} />
+          <OrderBoard orders={orders} workers={workers} onClaim={onClaim} onAssign={onAssign} onCancel={onCancel} />
           <div className="side-stack">
             <TrackingPanel orders={orders} onProgress={onProgress} />
             <ReviewPanel orders={orders} onReview={onReview} />

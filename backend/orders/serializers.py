@@ -29,6 +29,10 @@ def order_to_dict(order, include_detail=False):
         "status_label": order.get_status_display(),
         "claimed_by": worker_summary(order.claimed_by),
         "assigned_to": worker_summary(order.assigned_to),
+        "cancel_reason": order.cancel_reason,
+        "cancelled_by": order.cancelled_by,
+        "cancelled_by_label": order.get_cancelled_by_display() if order.cancelled_by else None,
+        "is_cancellable": order.is_cancellable,
         "created_at": order.created_at.isoformat(),
         "updated_at": order.updated_at.isoformat(),
     }

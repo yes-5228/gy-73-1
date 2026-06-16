@@ -89,5 +89,54 @@ def assign_order(request, order_id):
     if not order.claimed_by:
         order.claimed_by = worker
     order.save(update_fields=["assigned_to", "claimed_by", "status", "updated_at"])
+
+    if worker.status == Worker.STATUS_AVAILABLE:
+        worker.status = Worker.STATUS_BUSY
+        worker.save(update_fields=["status"])
+
     ProgressEvent.objects.create(order=order, stage=ProgressEvent.STAGE_ASSIGNED, worker=worker, message=f"平台已派单给 {worker.name}")
+    return JsonResponse(order_to_dict(order, include_detail=True))
+
+
+@csrf_exempt
+@require_http_methods(["POST"])
+def cancel_order(request, order_id):
+    order = get_object_or_404(MoveOrder, pk=order_id)
+    payload = read_json(request)
+
+    if not order.is_cancellable:
+        return bad_request("当前订单状态不能取消")
+
+    cancel_reason = payload.get("cancel_reason", "").strip()
+    if not cancel_reason:
+        return bad_request("请填写取消原因")
+
+    cancelled_by = payload.get("cancelled_by", MoveOrder.CANCELLED_BY_DISPATCHER)
+    if cancelled_by not in [MoveOrder.CANCELLED_BY_CUSTOMER, MoveOrder.CANCELLED_BY_DISPATCHER]:
+        return bad_request("取消发起方无效")
+
+    assigned_worker = order.assigned_to
+
+    order.status = MoveOrder.STATUS_CANCELLED
+    order.cancel_reason = cancel_reason
+    order.cancelled_by = cancelled_by
+    order.save(update_fields=["status", "cancel_reason", "cancelled_by", "updated_at"])
+
+    if assigned_worker and assigned_worker.status == Worker.STATUS_BUSY:
+        has_other_active_orders = MoveOrder.objects.filter(
+            assigned_to=assigned_worker,
+            status__in=[MoveOrder.STATUS_ASSIGNED, MoveOrder.STATUS_IN_PROGRESS],
+        ).exclude(pk=order.pk).exists()
+        if not has_other_active_orders:
+            assigned_worker.status = Worker.STATUS_AVAILABLE
+            assigned_worker.save(update_fields=["status"])
+
+    cancelled_by_label = dict(MoveOrder.CANCELLED_BY_CHOICES).get(cancelled_by, cancelled_by)
+    ProgressEvent.objects.create(
+        order=order,
+        stage=ProgressEvent.STAGE_CANCELLED,
+        worker=assigned_worker,
+        message=f"{cancelled_by_label}，原因：{cancel_reason}",
+    )
+
     return JsonResponse(order_to_dict(order, include_detail=True))

@@ -4,6 +4,7 @@ const toneMap = {
   assigned: "violet",
   in_progress: "green",
   completed: "neutral",
+  cancelled: "red",
   available: "green",
   busy: "amber",
   offline: "neutral",
