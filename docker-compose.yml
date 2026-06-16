@@ -1,0 +1,26 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    environment:
+      SQLITE_PATH: /data/db.sqlite3
+    volumes:
+      - backend_data:/data
+    healthcheck:
+      test: ["CMD-SHELL", "python -c \"import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health/', timeout=2).read()\""]
+      interval: 5s
+      timeout: 3s
+      retries: 20
+      start_period: 5s
+
+  frontend:
+    build:
+      context: ./frontend
+    ports:
+      - "19073:80"
+    depends_on:
+      backend:
+        condition: service_healthy
+
+volumes:
+  backend_data:
