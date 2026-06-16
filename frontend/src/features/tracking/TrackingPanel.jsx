@@ -10,7 +10,7 @@ const stages = [
 ];
 
 export default function TrackingPanel({ orders, onProgress }) {
-  const activeOrders = orders.filter((order) => order.status !== "completed");
+  const activeOrders = orders.filter((order) => !["completed", "cancelled"].includes(order.status));
   const [orderId, setOrderId] = useState("");
   const [stage, setStage] = useState("departed");
 

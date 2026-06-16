@@ -11,7 +11,12 @@ const seedWorkers = [
 export default function App() {
   const [orders, setOrders] = useState([]);
   const [workers, setWorkers] = useState([]);
-  const [error, setError] = useState("");
+  const [toast, setToast] = useState(null);
+
+  function showToast(message, type = "error") {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3000);
+  }
 
   async function refresh() {
     const [orderData, workerData] = await Promise.all([api.listOrders(), api.listWorkers()]);
@@ -24,13 +29,16 @@ export default function App() {
     }
   }
 
-  async function run(action) {
+  async function run(action, successMessage) {
     try {
-      setError("");
+      setToast(null);
       await action();
       await refresh();
+      if (successMessage) {
+        showToast(successMessage, "success");
+      }
     } catch (err) {
-      setError(err.message);
+      showToast(err.message, "error");
     }
   }
 
@@ -40,17 +48,17 @@ export default function App() {
 
   return (
     <>
-      {error && <div className="toast">{error}</div>}
+      {toast && <div className={`toast toast-${toast.type}`}>{toast.message}</div>}
       <Dashboard
         orders={orders}
         workers={workers}
-        onCreateOrder={(payload) => run(() => api.createOrder(payload))}
-        onCreateWorker={(payload) => run(() => api.createWorker(payload))}
-        onClaim={(orderId, workerId) => run(() => api.claimOrder(orderId, workerId))}
-        onAssign={(orderId, workerId) => run(() => api.assignOrder(orderId, workerId))}
-        onCancel={(orderId, payload) => run(() => api.cancelOrder(orderId, payload))}
-        onProgress={(orderId, payload) => run(() => api.addProgress(orderId, payload))}
-        onReview={(orderId, payload) => run(() => api.createReview(orderId, payload))}
+        onCreateOrder={(payload) => run(() => api.createOrder(payload), "订单创建成功")}
+        onCreateWorker={(payload) => run(() => api.createWorker(payload), "师傅添加成功")}
+        onClaim={(orderId, workerId) => run(() => api.claimOrder(orderId, workerId), "抢单成功")}
+        onAssign={(orderId, workerId) => run(() => api.assignOrder(orderId, workerId), "派单成功")}
+        onCancel={(orderId, payload) => run(() => api.cancelOrder(orderId, payload), "订单已取消")}
+        onProgress={(orderId, payload) => run(() => api.addProgress(orderId, payload), "进度更新成功")}
+        onReview={(orderId, payload) => run(() => api.createReview(orderId, payload), "评价提交成功")}
       />
     </>
   );
