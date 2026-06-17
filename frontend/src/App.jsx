@@ -37,8 +37,10 @@ export default function App() {
       if (successMessage) {
         showToast(successMessage, "success");
       }
+      return true;
     } catch (err) {
       showToast(err.message, "error");
+      throw err;
     }
   }
 

@@ -7,25 +7,38 @@ export default function OrderBoard({ orders, workers, onClaim, onAssign, onCance
   const [cancellingOrder, setCancellingOrder] = useState(null);
   const [cancelReason, setCancelReason] = useState("");
   const [cancelledBy, setCancelledBy] = useState("dispatcher");
+  const [cancelling, setCancelling] = useState(false);
+  const [cancelError, setCancelError] = useState("");
 
   function openCancelDialog(order) {
     setCancellingOrder(order);
     setCancelReason("");
     setCancelledBy("dispatcher");
+    setCancelError("");
   }
 
   function closeCancelDialog() {
+    if (cancelling) return;
     setCancellingOrder(null);
     setCancelReason("");
+    setCancelError("");
   }
 
-  function handleCancel() {
-    if (!cancelReason.trim()) return;
-    onCancel(cancellingOrder.id, {
-      cancel_reason: cancelReason.trim(),
-      cancelled_by: cancelledBy,
-    });
-    closeCancelDialog();
+  async function handleCancel() {
+    if (!cancelReason.trim() || cancelling) return;
+    setCancelling(true);
+    setCancelError("");
+    try {
+      await onCancel(cancellingOrder.id, {
+        cancel_reason: cancelReason.trim(),
+        cancelled_by: cancelledBy,
+      });
+      closeCancelDialog();
+    } catch (err) {
+      setCancelError(err.message || "取消失败，请重试");
+    } finally {
+      setCancelling(false);
+    }
   }
 
   return (
@@ -107,6 +120,7 @@ export default function OrderBoard({ orders, workers, onClaim, onAssign, onCance
             </div>
             <div className="modal-body">
               <p>确定要取消 <strong>{cancellingOrder.customer_name}</strong> 的订单吗？</p>
+              {cancelError && <div className="form-error">{cancelError}</div>}
               <div className="form-group">
                 <label>取消原因</label>
                 <textarea
@@ -114,24 +128,25 @@ export default function OrderBoard({ orders, workers, onClaim, onAssign, onCance
                   onChange={(e) => setCancelReason(e.target.value)}
                   placeholder="请填写取消原因..."
                   rows={3}
+                  disabled={cancelling}
                 />
               </div>
               <div className="form-group">
                 <label>取消发起方</label>
-                <select value={cancelledBy} onChange={(e) => setCancelledBy(e.target.value)}>
+                <select value={cancelledBy} onChange={(e) => setCancelledBy(e.target.value)} disabled={cancelling}>
                   <option value="dispatcher">调度员取消</option>
                   <option value="customer">客户取消</option>
                 </select>
               </div>
             </div>
             <div className="modal-foot">
-              <button className="btn-secondary" onClick={closeCancelDialog}>取消</button>
+              <button className="btn-secondary" onClick={closeCancelDialog} disabled={cancelling}>取消</button>
               <button
                 className="btn-danger"
                 onClick={handleCancel}
-                disabled={!cancelReason.trim()}
+                disabled={!cancelReason.trim() || cancelling}
               >
-                确认取消
+                {cancelling ? "取消中..." : "确认取消"}
               </button>
             </div>
           </div>

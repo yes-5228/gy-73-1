@@ -42,7 +42,7 @@ export default function TrackingPanel({ orders, onProgress }) {
         <button className="primary-button" type="submit">更新进度</button>
       </form>
       <div className="timeline">
-        {orders.slice(0, 4).map((order) => (
+        {activeOrders.slice(0, 4).map((order) => (
           <div className="timeline-item" key={order.id}>
             <span />
             <div>
