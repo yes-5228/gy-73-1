@@ -110,7 +110,7 @@ export default function OrderBoard({ orders, workers, onClaim, onAssign, onCance
       </div>
 
       {cancellingOrder && (
-        <div className="modal-overlay" onClick={closeCancelDialog}>
+        <div className="modal-overlay" onClick={() => !cancelling && closeCancelDialog()}>
           <div className="modal" onClick={(e) => e.stopPropagation()}>
             <div className="modal-head">
               <h3>取消订单</h3>
